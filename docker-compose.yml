@@ -1,0 +1,26 @@
+version: '3'
+services:
+  redis:
+    image: redis:7
+    volumes:
+      - ${CACHE_DIR_PATH:-.cache}/redis-data:/data
+  worker:
+    build:
+      context: .
+    environment:
+      CUDA_DEVICE: ${CUDA_DEVICE:--1}
+      REDIS_URL: redis://redis:6379
+      RELAY_URL: wss://saltivka.org
+      SECRET_KEY: d46690389fbf9d16ef4c5b9c87f0958c60c903e418e182cb37db55f017be7405
+      PAST_EVENTS_LIMIT: 1000
+    volumes:
+      - ${CACHE_DIR_PATH:-.cache}:/root/.cache
+    depends_on:
+      - redis
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
